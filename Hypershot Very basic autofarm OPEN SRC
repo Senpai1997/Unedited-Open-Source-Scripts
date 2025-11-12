@@ -1,0 +1,32 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+--/ Configurable teleport distance
+local teleportDistance = 5
+
+local function setTeleportDistance(studs)
+	if typeof(studs) == "number" and studs > 0 then
+		teleportDistance = studs
+	end
+end
+
+local function getTargetPosition()
+	local root = character:FindFirstChild("HumanoidRootPart")
+	if root then
+		return root.Position + (root.CFrame.LookVector * teleportDistance)
+	end
+end
+
+RunService.RenderStepped:Connect(function()
+	local targetPos = getTargetPosition()
+	if targetPos then
+		for _, mob in ipairs(workspace:WaitForChild("Mobs"):GetChildren()) do
+			if mob:IsA("Model") and mob.PrimaryPart then
+				mob:SetPrimaryPartCFrame(CFrame.new(targetPos))
+			end
+		end
+	end
+end)
